@@ -4,8 +4,8 @@ import Footer from "@/components/Footer";
 import EventSubmissionForm from "@/components/EventSubmissionForm";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { MapPin, Calendar, Users, Sparkles, ArrowRight, Star, Heart } from "lucide-react";
-import culturalHero from "@/assets/cultural-hero.jpg";
+import { MapPin, Calendar, Users, Sparkles, ArrowRight, Heart } from "lucide-react";
+import culturalHero from "@/assets/minsk.jpg";
 
 const Index = () => {
   const features = [
@@ -38,11 +38,11 @@ const Index = () => {
       <main>
         {/* Hero Section */}
         <section className="relative py-20 lg:py-32 overflow-hidden">
-          <div className="absolute inset-0 bg-hero-gradient opacity-90"></div>
           <div 
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-20"
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
             style={{ backgroundImage: `url(${culturalHero})` }}
           ></div>
+          <div className="absolute inset-0 bg-amber-400/10 pointer-events-none"></div>
           
           <div className="relative container mx-auto px-4 text-center">
             <div className="max-w-4xl mx-auto animate-fade-in">
@@ -121,66 +121,22 @@ const Index = () => {
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
               <div className="space-y-2">
-                <div className="text-4xl font-bold">200+</div>
-                <div className="text-primary-foreground/80">Мероприятий в месяц</div>
+                <div className="text-4xl font-bold"></div>
+                <div className="text-primary-foreground/80">Ежемесячно проводится множество мероприятий</div>
               </div>
               <div className="space-y-2">
-                <div className="text-4xl font-bold">50+</div>
-                <div className="text-primary-foreground/80">Культурных площадок</div>
+                <div className="text-4xl font-bold"></div>
+                <div className="text-primary-foreground/80">Имеется большое количество культурных площадок</div>
               </div>
               <div className="space-y-2">
-                <div className="text-4xl font-bold">10K+</div>
-                <div className="text-primary-foreground/80">Довольных пользователей</div>
+                <div className="text-4xl font-bold"></div>
+                <div className="text-primary-foreground/80">Множество пользователей остаются довольны</div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Testimonials */}
-        <section className="py-20">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">
-                Что говорят наши пользователи
-              </h2>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {[
-                {
-                  name: "Анна Петрова",
-                  role: "Театралка",
-                  text: "Благодаря этому сайту я не пропускаю ни одной интересной премьеры! Очень удобно."
-                },
-                {
-                  name: "Михаил Иванов", 
-                  role: "Любитель искусства",
-                  text: "Отличная подборка выставок и музейных мероприятий. Рекомендую всем!"
-                },
-                {
-                  name: "Елена Сидорова",
-                  role: "Организатор мероприятий", 
-                  text: "Простая форма подачи заявок помогает нам привлекать больше посетителей."
-                }
-              ].map((testimonial, index) => (
-                <Card key={index} className="event-card">
-                  <CardContent className="pt-6">
-                    <div className="flex items-center mb-4">
-                      {[...Array(5)].map((_, i) => (
-                        <Star key={i} size={16} className="fill-accent text-accent" />
-                      ))}
-                    </div>
-                    <p className="text-muted-foreground mb-4 italic">"{testimonial.text}"</p>
-                    <div>
-                      <div className="font-semibold">{testimonial.name}</div>
-                      <div className="text-sm text-muted-foreground">{testimonial.role}</div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
+        
 
         {/* Event Submission Form Section */}
         <section id="submit-form" className="py-20 bg-subtle-gradient">
@@ -218,7 +174,7 @@ const Index = () => {
                   </Button>
                 </Link>
                 <Link to="/map">
-                  <Button size="lg" variant="outline" className="text-lg px-8 py-4 border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
+                  <Button size="lg" variant="outline" className="text-lg px-8 py-4 border-primary-foreground !bg-transparent !text-primary-foreground hover:!bg-transparent hover:!text-primary-foreground">
                     <MapPin className="mr-2" size={20} />
                     Открыть карту
                   </Button>
