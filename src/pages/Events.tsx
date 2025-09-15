@@ -74,15 +74,12 @@ const mockEvents = [
 
 const Events = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("Все");
-
-  const categories = ["Все", "Выставка", "Концерт", "Театр", "Кино", "Мастер-класс"];
+  const [selectedDate, setSelectedDate] = useState("");
 
   const filteredEvents = mockEvents.filter(event => {
-    const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         event.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === "Все" || event.category === selectedCategory;
-    return matchesSearch && matchesCategory;
+    const matchesTitle = event.title.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesDate = selectedDate ? event.date === selectedDate : true;
+    return matchesTitle && matchesDate;
   });
 
   const formatDate = (dateString: string) => {
@@ -108,7 +105,7 @@ const Events = () => {
           </p>
         </div>
 
-        {/* Search and Filter */}
+        {/* Search and Date Filter */}
         <div className="flex flex-col md:flex-row gap-4 mb-8">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={20} />
@@ -119,19 +116,12 @@ const Events = () => {
               className="pl-10"
             />
           </div>
-          
-          <div className="flex flex-wrap gap-2">
-            {categories.map((category) => (
-              <Button
-                key={category}
-                variant={selectedCategory === category ? "default" : "outline"}
-                size="sm"
-                onClick={() => setSelectedCategory(category)}
-                className={selectedCategory === category ? "btn-cultural" : ""}
-              >
-                {category}
-              </Button>
-            ))}
+          <div className="w-full md:w-64">
+            <Input
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+            />
           </div>
         </div>
 

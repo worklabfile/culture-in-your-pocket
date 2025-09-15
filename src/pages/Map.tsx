@@ -4,8 +4,9 @@ import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Calendar, Clock, Navigation } from "lucide-react";
+import { MapPin, Calendar, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
+import { YMaps, Map as YMap, Placemark, ZoomControl, GeolocationControl } from "@pbe/react-yandex-maps";
 
 // Mock map data
 const mapEvents = [
@@ -67,54 +68,47 @@ const Map = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Map Placeholder */}
+          {/* Yandex Map */}
           <div className="lg:col-span-2">
             <Card className="h-[600px] relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-muted/50 to-muted flex items-center justify-center">
-                {/* Simple map representation */}
-                <div className="relative w-full h-full bg-gradient-to-br from-green-100 to-blue-100 dark:from-green-900/20 dark:to-blue-900/20">
-                  {/* River (Svisloch) */}
-                  <div className="absolute top-1/3 left-1/4 w-1/2 h-2 bg-blue-300 rounded-full transform rotate-12"></div>
-                  
-                  {/* Event markers */}
-                  {mapEvents.map((event, index) => (
-                    <button
-                      key={event.id}
-                      onClick={() => setSelectedEvent(event)}
-                      className={`absolute w-8 h-8 rounded-full flex items-center justify-center text-white font-bold shadow-lg hover:scale-110 transition-transform cultural-pulse ${
-                        selectedEvent?.id === event.id ? 'bg-accent animate-cultural-pulse' : 'bg-primary'
-                      }`}
-                      style={{
-                        left: `${30 + index * 20}%`,
-                        top: `${40 + index * 10}%`
-                      }}
-                      title={event.title}
-                    >
-                      {index + 1}
-                    </button>
-                  ))}
-                  
-                  {/* City center indicator */}
-                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                    <div className="w-4 h-4 bg-gray-600 rounded-full"></div>
-                    <div className="text-xs text-gray-600 mt-1 whitespace-nowrap">Центр Минска</div>
-                  </div>
-                </div>
-                
-                {/* Legend */}
-                <div className="absolute bottom-4 left-4 bg-card/95 backdrop-blur-sm rounded-lg p-3 shadow-lg">
-                  <div className="text-sm font-medium mb-2">Легенда:</div>
-                  <div className="flex items-center space-x-2 text-xs">
-                    <div className="w-4 h-4 bg-primary rounded-full"></div>
-                    <span>Мероприятие</span>
-                  </div>
-                </div>
-                
-                {/* Controls */}
-                <div className="absolute top-4 right-4 flex flex-col gap-2">
-                  <Button size="sm" variant="outline" className="bg-card/95 backdrop-blur-sm">
-                    <Navigation size={16} />
-                  </Button>
+              <div className="absolute inset-0">
+                <YMaps>
+                  <YMap
+                    defaultState={{ center: [53.9023, 27.5619], zoom: 12 }}
+                    width="100%"
+                    height="100%"
+                    options={{
+                      suppressMapOpenBlock: true,
+                    }}
+                  >
+                    <ZoomControl options={{ position: { right: 16, top: 16 } }} />
+                    <GeolocationControl options={{ position: { right: 16, top: 64 } }} />
+                    {mapEvents.map((event) => (
+                      <Placemark
+                        key={event.id}
+                        geometry={[event.coordinates.lat, event.coordinates.lng]}
+                        properties={{
+                          balloonContentHeader: event.title,
+                          balloonContentBody: `<div>${event.location}<br/>${event.address}</div>`,
+                          hintContent: event.title,
+                        }}
+                        options={{
+                          preset: selectedEvent?.id === event.id ? 'islands#redIcon' : 'islands#blueIcon',
+                          openBalloonOnClick: false,
+                        }}
+                        modules={["geoObject.addon.hint", "geoObject.addon.balloon"]}
+                        onClick={() => setSelectedEvent(event)}
+                      />
+                    ))}
+                  </YMap>
+                </YMaps>
+              </div>
+              {/* Legend */}
+              <div className="absolute bottom-4 left-4 bg-card/95 backdrop-blur-sm rounded-lg p-3 shadow-lg">
+                <div className="text-sm font-medium mb-2">Легенда:</div>
+                <div className="flex items-center space-x-2 text-xs">
+                  <div className="w-4 h-4 bg-primary rounded-full"></div>
+                  <span>Мероприятие</span>
                 </div>
               </div>
             </Card>
