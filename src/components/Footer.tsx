@@ -16,18 +16,29 @@ const Footer = () => {
           <div className="space-y-4">
             <h4 className="font-semibold text-foreground">Контакты</h4>
             <div className="space-y-2 text-sm text-muted-foreground">
-              <div className="flex items-center space-x-2">
-                <Mail size={16} />
-                <span>info@cultura-minsk.by</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Phone size={16} />
-                <span>+375 (29) 123-45-67</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <MapPin size={16} />
-                <span>Минск, Беларусь</span>
-              </div>
+            <div className="flex items-center space-x-2">
+              <Mail size={16} />
+              <a href="mailto:info@cultura-minsk.by" className="hover:text-primary transition-colors">
+                info@cultura-minsk.by
+              </a>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Phone size={16} />
+              <a href="tel:+375291234567" className="hover:text-primary transition-colors">
+                +375 (29) 123-45-67
+              </a>
+            </div>
+            <div className="flex items-center space-x-2">
+              <MapPin size={16} />
+              <a
+                href="https://yandex.by/maps/157/minsk/?ll=27.555691%2C53.902735&z=12"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-primary transition-colors"
+              >
+                Минск, Беларусь
+              </a>
+            </div>
             </div>
           </div>
           

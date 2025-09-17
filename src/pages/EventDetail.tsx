@@ -69,9 +69,15 @@ const EventDetail = () => {
         <div className="container mx-auto px-4 py-16 text-center">
           <h1 className="text-2xl font-bold mb-4">Мероприятие не найдено</h1>
           <Link to="/events">
-            <Button className="btn-cultural">
-              Вернуться к списку мероприятий
-            </Button>
+          <Button
+            className="btn-cultural 
+                      group 
+                      transition-all duration-300 
+                      hover:scale-105 hover:shadow-xl hover:shadow-primary/30 
+                      active:scale-95"
+          >
+            Вернуться к списку мероприятий
+          </Button>
           </Link>
         </div>
         <Footer />
@@ -141,7 +147,13 @@ const EventDetail = () => {
                     variant="outline"
                     size="sm"
                     onClick={handleShare}
-                    className="flex items-center"
+                    className="flex items-center
+                              group
+                              transition-all duration-300 
+                              hover:scale-105 hover:shadow-lg hover:shadow-primary/20 
+                              active:scale-95
+                              will-change-transform 
+                              backface-visibility-hidden"
                   >
                     <Share2 size={16} className="mr-1" />
                     Поделиться
@@ -150,7 +162,13 @@ const EventDetail = () => {
                     variant="outline"
                     size="sm"
                     onClick={handleAddToFavorites}
-                    className="flex items-center"
+                    className="flex items-center
+                              group
+                              transition-all duration-300 
+                              hover:scale-105 hover:shadow-lg hover:shadow-primary/20 
+                              active:scale-95
+                              will-change-transform 
+                              backface-visibility-hidden"
                   >
                     <Heart size={16} className="mr-1" />
                     В избранное
@@ -168,7 +186,7 @@ const EventDetail = () => {
             </div>
             
             {/* Full Description */}
-            <Card>
+            <Card className="event-card">
               <CardContent className="pt-6">
                 <h2 className="text-xl font-semibold mb-4">О мероприятии</h2>
                 <div className="prose prose-gray max-w-none">
@@ -222,11 +240,30 @@ const EventDetail = () => {
                 </div>
                 
                 <div className="space-y-2">
-                  <Button className="w-full btn-cultural">
+                  <Button
+                    className="w-full 
+                              btn-cultural
+                              group
+                              bg-white 
+                              transition-all duration-300 
+                              hover:scale-105 hover:shadow-lg hover:shadow-primary/20 
+                              active:scale-95
+                              will-change-transform 
+                              backface-visibility-hidden
+                              border-none"
+                  >
                     Купить билет
                   </Button>
                   <Link to="/map" className="block w-full">
-                    <Button variant="outline" className="w-full">
+                    <Button variant="outline" 
+                      className="w-full
+                                group
+                                transition-all duration-300 
+                                hover:scale-105 hover:shadow-lg hover:shadow-primary/20 
+                                active:scale-95
+                                will-change-transform 
+                                backface-visibility-hiddens"
+                    >
                       Показать на карте
                     </Button>
                   </Link>
@@ -235,7 +272,7 @@ const EventDetail = () => {
             </Card>
             
             {/* Contact Information */}
-            <Card>
+            <Card className="event-card">
               <CardContent className="pt-6 space-y-4">
                 <h3 className="font-semibold text-lg mb-4">Контакты</h3>
                 

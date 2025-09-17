@@ -121,7 +121,7 @@ const Map = () => {
             {mapEvents.map((event, index) => (
               <Card 
                 key={event.id}
-                className={`cursor-pointer transition-all duration-200 hover:shadow-md ${
+                className={`cursor-pointer transition-all duration-200 hover:shadow-md  ${
                   selectedEvent?.id === event.id ? 'ring-2 ring-primary shadow-lg' : ''
                 }`}
                 onClick={() => setSelectedEvent(event)}
@@ -158,12 +158,17 @@ const Map = () => {
                   <div className="text-sm text-muted-foreground">
                     {event.address}
                   </div>
-                  
-                  <Link to={`/event/${event.id}`}>
-                    <Button size="sm" className="w-full mt-3 btn-outline-cultural">
-                      Подробнее
-                    </Button>
-                  </Link>
+                    <Link to={`/event/${event.id}`} className="block w-full">
+                      <Button
+                        className="w-full btn-outline-cultural 
+                                  group 
+                                  transition-all duration-300 
+                                  hover:scale-105 hover:shadow-lg hover:shadow-primary/20 
+                                  active:scale-95 mt-2"
+                      >
+                        Подробнее
+                      </Button>
+                    </Link>
                 </CardContent>
               </Card>
             ))}
@@ -176,7 +181,15 @@ const Map = () => {
                   Не видите свое мероприятие на карте?
                 </p>
                 <Link to="/#submit-form">
-                  <Button variant="outline">
+                  <Button variant="outline"
+                    className="flex items-center
+                              group
+                              transition-all duration-300 
+                              hover:scale-105 hover:shadow-lg hover:shadow-primary/20 
+                              active:scale-95
+                              will-change-transform 
+                              backface-visibility-hidden"
+                  >
                     Предложить мероприятие
                   </Button>
                 </Link>

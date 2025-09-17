@@ -43,7 +43,6 @@ const EventsToday = () => {
       <main className="container mx-auto px-4 py-8">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
-            <Sparkles className="text-accent mr-3" size={32} />
             <h1 className="text-3xl md:text-4xl font-bold text-primary">
               Мероприятия сегодня
             </h1>
@@ -61,7 +60,10 @@ const EventsToday = () => {
             {todaysEvents.map((event, index) => (
               <Card 
                 key={event.id} 
-                className="event-card animate-fade-in bg-gradient-to-br from-card to-card/50"
+                className="event-card animate-fade-in bg-gradient-to-br from-card to-card/50
+                           transition-all duration-300 
+                           hover:scale-110 hover:-translate-y-4 hover:shadow-2xl hover:shadow-primary/40 
+                           cursor-pointer"
                 style={{ animationDelay: `${index * 0.2}s` }}
               >
                 <div className="aspect-video bg-gradient-to-br from-primary/30 to-accent/30 rounded-t-xl relative">
@@ -99,11 +101,27 @@ const EventsToday = () => {
                   
                   <div className="flex gap-2">
                     <Link to={`/event/${event.id}`} className="flex-1">
-                      <Button className="w-full btn-cultural">
+                      <Button
+                        className="w-full btn-outline-cultural 
+                                  group 
+                                  transition-all duration-300 
+                                  hover:scale-105 hover:shadow-lg hover:shadow-primary/20 
+                                  active:scale-95"
+                      >
                         Подробнее
                       </Button>
                     </Link>
-                    <Button variant="outline" className="flex-1">
+                    <Button
+                      variant="outline"
+                      className="flex-1 
+                                group 
+                                transition-all duration-300 
+                                hover:scale-105 hover:shadow-lg hover:shadow-primary/20 
+                                active:scale-95
+                                will-change-transform 
+                                backface-visibility-hidden
+                                border-none"
+                    >
                       Маршрут
                     </Button>
                   </div>
@@ -129,7 +147,17 @@ const EventsToday = () => {
         {todaysEvents.length > 0 && (
           <div className="text-center mt-12">
             <Link to="/events">
-              <Button variant="outline" size="lg">
+              <Button variant="outline" size="lg"
+                className="flex-1 
+                          group
+                          bg-white 
+                          transition-all duration-300 
+                          hover:scale-105 hover:shadow-lg hover:shadow-primary/20 
+                          active:scale-95
+                          will-change-transform 
+                          backface-visibility-hidden
+                          border-none"
+              >
                 Посмотреть все мероприятия
               </Button>
             </Link>

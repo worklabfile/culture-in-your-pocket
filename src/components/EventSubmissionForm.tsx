@@ -27,7 +27,6 @@ const EventSubmissionForm = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Here you would typically send the data to your backend
     console.log("Event submission:", formData);
     
     toast({
@@ -35,7 +34,6 @@ const EventSubmissionForm = () => {
       description: "Мы рассмотрим ваше мероприятие и добавим его в наш список.",
     });
     
-    // Reset form
     setFormData({
       title: "",
       description: "",
@@ -48,17 +46,21 @@ const EventSubmissionForm = () => {
   };
 
   return (
-    <Card className="max-w-2xl mx-auto">
+    <Card className="max-w-2xl mx-auto event-card
+                    p-1
+                    transition-all duration-250 ease-out
+                    md:hover:scale-103 md:hover:-translate-y-1
+                    md:hover:shadow-xl md:hover:shadow-primary/25
+                    active:scale-100 active:translate-y-0
+                    cursor-pointer"
+    >
       <CardHeader className="text-center">
         <CardTitle className="text-2xl font-bold text-primary">
           Предложить мероприятие
         </CardTitle>
-        <CardDescription className="text-muted-foreground">
-          Знаете о интересном культурном событии? Расскажите нам о нём!
-        </CardDescription>
       </CardHeader>
       
-      <CardContent>
+      <CardContent className="-m-1">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -156,8 +158,18 @@ const EventSubmissionForm = () => {
             />
           </div>
           
-          <Button type="submit" className="w-full btn-cultural">
-            <Send size={16} className="mr-2" />
+          <Button
+            type="submit"
+            className="w-full btn-cultural 
+                      group 
+                      transition-all duration-300 
+                      hover:scale-105 hover:shadow-lg 
+                      active:scale-95"
+          >
+            <Send
+              size={16}
+              className="mr-2 transition-transform duration-300 group-hover:scale-120 group-hover:rotate-12"
+            />
             Отправить предложение
           </Button>
         </form>

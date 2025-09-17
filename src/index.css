@@ -130,11 +130,11 @@ All colors MUST be HSL.
 @layer components {
   /* Cultural hero text */
   .hero-title {
-    @apply text-4xl md:text-6xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent;
+    @apply text-4xl md:text-5xl lg:text-6xl font-bold text-white;
   }
   
   .hero-subtitle {
-    @apply text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto;
+    @apply text-lg md:text-xl text-white max-w-2xl mx-auto;
   }
   
   /* Cultural button variants */
@@ -164,3 +164,20 @@ All colors MUST be HSL.
     background: var(--gradient-subtle);
   }
 }
+@layer utilities {
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fadeInUp 0.6s ease-out both;
+  }
+}
+

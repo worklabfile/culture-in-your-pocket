@@ -5,7 +5,7 @@ import EventSubmissionForm from "@/components/EventSubmissionForm";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin, Calendar, Users, Sparkles, ArrowRight, Heart } from "lucide-react";
-import culturalHero from "@/assets/minsk.jpg";
+import { Building2, Smile } from "lucide-react";
 
 const Index = () => {
   const features = [
@@ -38,10 +38,16 @@ const Index = () => {
       <main>
         {/* Hero Section */}
         <section className="relative py-20 lg:py-32 overflow-hidden">
-          <div 
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-            style={{ backgroundImage: `url(${culturalHero})` }}
-          ></div>
+        <div className="absolute inset-0">
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover"
+            src="\src\assets\hero-video.mp4"
+          />
+        </div>
           <div className="absolute inset-0 bg-amber-400/10 pointer-events-none"></div>
           
           <div className="relative container mx-auto px-4 text-center">
@@ -56,17 +62,42 @@ const Index = () => {
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                 <Link to="/map">
-                  <Button size="lg" className="btn-cultural text-lg px-8 py-4">
-                    <MapPin className="mr-2" size={20} />
-                    Открыть карту мероприятий
-                    <ArrowRight className="ml-2" size={20} />
-                  </Button>
+                <Button
+                  size="lg"
+                  className="btn-cultural text-lg px-8 py-4 
+                            group 
+                            transition-all duration-300 
+                            hover:scale-105 hover:shadow-xl hover:shadow-primary/30 
+                            active:scale-95"
+                >
+                  <MapPin
+                    className="mr-2 transition-transform duration-300 group-hover:scale-120 group-hover:rotate-12"
+                    size={20}
+                  />
+                  Открыть карту мероприятий
+                  <ArrowRight
+                    className="ml-2 transition-transform duration-300 group-hover:scale-120 group-hover:translate-x-1"
+                    size={20}
+                  />
+                </Button>
                 </Link>
                 <Link to="/events/today">
-                  <Button size="lg" variant="outline" className="btn-outline-cultural text-lg px-8 py-4">
-                    <Calendar className="mr-2" size={20} />
-                    Что сегодня?
-                  </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="btn-outline-cultural text-lg px-8 py-4 
+                            group 
+                            transition-all duration-300 
+                            hover:scale-105 hover:shadow-lg hover:shadow-primary/20 
+                            active:scale-95
+                            border-none"
+                >
+                  <Calendar
+                    className="mr-2 transition-transform duration-300 group-hover:scale-120 group-hover:rotate-12"
+                    size={20}
+                  />
+                  Что сегодня?
+                </Button>
                 </Link>
               </div>
             </div>
@@ -85,7 +116,7 @@ const Index = () => {
                 Почему выбирают нас?
               </h2>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                Мы делаем культурную жизнь Минска доступной и удобной для каждого
+                Мы делаем культурную жизнь Минска доступной и удобной
               </p>
             </div>
             
@@ -95,7 +126,10 @@ const Index = () => {
                 return (
                   <Card 
                     key={index} 
-                    className="event-card text-center animate-fade-in"
+                    className="event-card text-center animate-fade-in 
+                              transition-all duration-300 
+                              hover:scale-110 hover:-translate-y-4 hover:shadow-2xl hover:shadow-primary/40 
+                              cursor-pointer"
                     style={{ animationDelay: `${index * 0.1}s` }}
                   >
                     <CardHeader>
@@ -121,15 +155,15 @@ const Index = () => {
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
               <div className="space-y-2">
-                <div className="text-4xl font-bold"></div>
+                <div className="text-4xl font-bold">70+</div>
                 <div className="text-primary-foreground/80">Ежемесячно проводится множество мероприятий</div>
               </div>
               <div className="space-y-2">
-                <div className="text-4xl font-bold"></div>
-                <div className="text-primary-foreground/80">Имеется большое количество культурных площадок</div>
+                <div className="text-4xl font-bold">50+</div>
+                <div className="text-primary-foreground/80">Большое количество культурных площадок</div>
               </div>
               <div className="space-y-2">
-                <div className="text-4xl font-bold"></div>
+                <div className="text-4xl font-bold">95%</div>
                 <div className="text-primary-foreground/80">Множество пользователей остаются довольны</div>
               </div>
             </div>
@@ -168,16 +202,44 @@ const Index = () => {
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link to="/events">
-                  <Button size="lg" variant="secondary" className="text-lg px-8 py-4">
-                    <Heart className="mr-2" size={20} />
-                    Все мероприятия
-                  </Button>
+                <Button
+                  size="lg"
+                  variant="secondary"
+                  className="text-lg px-8 py-4 
+                            transition-all duration-300 
+                            hover:scale-105 hover:shadow-md 
+                            hover:bg-secondary/90 
+                            active:scale-95 
+                            relative group"
+                >
+                  <Heart
+                    className="mr-2 transition-transform duration-300 group-hover:scale-120 group-hover:rotate-12"
+                    size={20}
+                  />
+                  Все мероприятия
+                </Button>
                 </Link>
                 <Link to="/map">
-                  <Button size="lg" variant="outline" className="text-lg px-8 py-4 border-primary-foreground !bg-transparent !text-primary-foreground hover:!bg-transparent hover:!text-primary-foreground">
-                    <MapPin className="mr-2" size={20} />
-                    Открыть карту
-                  </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="text-lg px-8 py-4 
+                            border-primary-foreground 
+                            !bg-transparent 
+                            !text-primary-foreground 
+                            hover:!bg-transparent 
+                            hover:!text-primary-foreground
+                            transition-all duration-300 
+                            hover:scale-105 hover:shadow-md 
+                            active:scale-95 
+                            group"
+                >
+                  <MapPin
+                    className="mr-2 transition-transform duration-300 group-hover:scale-120 group-hover:rotate-12"
+                    size={20}
+                  />
+                  Открыть карту
+                </Button>
                 </Link>
               </div>
             </div>

@@ -130,8 +130,14 @@ const Events = () => {
           {filteredEvents.map((event, index) => (
             <Card 
               key={event.id} 
-              className="event-card animate-fade-in"
-              style={{ animationDelay: `${index * 0.1}s` }}
+              className="event-card animate-fade-in opacity-0
+                         transition-all duration-300 
+                         hover:scale-110 hover:-translate-y-4 hover:shadow-2xl hover:shadow-primary/40 
+                         cursor-pointer"
+              style={{ 
+                animationDelay: `${index * 0.1}s`,
+                animationFillMode: 'forwards' 
+              }}
             >
               <div className="aspect-video bg-gradient-to-br from-primary/20 to-accent/20 rounded-t-xl"></div>
               
@@ -166,7 +172,13 @@ const Events = () => {
                 </div>
                 
                 <Link to={`/event/${event.id}`} className="block w-full">
-                  <Button className="w-full btn-outline-cultural">
+                  <Button
+                    className="w-full btn-outline-cultural 
+                              group 
+                              transition-all duration-300 
+                              hover:scale-105 hover:shadow-lg hover:shadow-primary/20 
+                              active:scale-95"
+                  >
                     Подробнее
                   </Button>
                 </Link>
