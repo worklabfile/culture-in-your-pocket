@@ -4,6 +4,7 @@ import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { MapPin, Calendar, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
 import { YMaps, Map as YMap, Placemark, ZoomControl, GeolocationControl } from "@pbe/react-yandex-maps";
@@ -32,6 +33,7 @@ const Map = () => {
   const [events, setEvents] = useState<any[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -90,6 +92,9 @@ const Map = () => {
     fetchEvents();
   }, []);
 
+  const todayStr = new Date().toISOString().split('T')[0];
+  const filteredEvents = events.filter((event) => event.date === selectedDate);
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('ru-RU', { 
@@ -138,7 +143,7 @@ const Map = () => {
                     >
                       <ZoomControl options={{ position: { right: 16, top: 16 } }} />
                       <GeolocationControl options={{ position: { right: 16, top: 64 } }} />
-                      {events.map((event) => (
+                      {filteredEvents.map((event) => (
                         <Placemark
                           key={event.id}
                           geometry={[event.coordinates.lat, event.coordinates.lng]}
@@ -158,11 +163,25 @@ const Map = () => {
                     </YMap>
                   </YMaps>
                 </div>
-                <div className="absolute bottom-4 left-4 bg-card/95 backdrop-blur-sm rounded-lg p-3 shadow-lg">
-                  <div className="text-sm font-medium mb-2">Легенда:</div>
-                  <div className="flex items-center space-x-2 text-xs">
+                <div className="absolute top-4 left-4 bg-card/95 backdrop-blur-sm rounded-lg p-3 shadow-lg space-y-3">
+                  <div className="text-sm font-medium">Легенда и фильтр</div>
+                  <div className="flex items-center gap-2 text-xs">
                     <div className="w-4 h-4 bg-primary rounded-full"></div>
                     <span>Мероприятие</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="date"
+                      value={selectedDate}
+                      onChange={(e) => setSelectedDate(e.target.value)}
+                    />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setSelectedDate(todayStr)}
+                    >
+                      Сегодня
+                    </Button>
                   </div>
                 </div>
               </Card>
@@ -171,7 +190,7 @@ const Map = () => {
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Мероприятия на карте</h2>
               
-              {events.map((event, index) => (
+              {filteredEvents.map((event, index) => (
                 <Card 
                   key={event.id}
                   className={`cursor-pointer transition-all duration-200 hover:shadow-md ${
@@ -225,6 +244,14 @@ const Map = () => {
                   </CardContent>
                 </Card>
               ))}
+
+              {filteredEvents.length === 0 && (
+                <Card>
+                  <CardContent className="py-6 text-center text-muted-foreground">
+                    На выбранную дату событий нет.
+                  </CardContent>
+                </Card>
+              )}
               
               <Card className="border-dashed border-2 border-muted-foreground/30">
                 <CardContent className="flex flex-col items-center justify-center py-8 text-center">
