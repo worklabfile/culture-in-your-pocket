@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,42 +8,87 @@ import { MapPin, Calendar, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
 import { YMaps, Map as YMap, Placemark, ZoomControl, GeolocationControl } from "@pbe/react-yandex-maps";
 
-// Mock map data
-const mapEvents = [
-  {
-    id: 1,
-    title: "Выставка современного искусства",
-    location: "Национальный художественный музей",
-    address: "ул. Ленина, 20",
-    date: "2024-01-15",
-    time: "18:00",
-    category: "Выставка",
-    coordinates: { lat: 53.898, lng: 27.549 }
-  },
-  {
-    id: 2,
-    title: "Концерт классической музыки",
-    location: "Белорусская государственная филармония",
-    address: "ул. Янки Купалы, 50",
-    date: "2024-01-18",
-    time: "19:30",
-    category: "Концерт",
-    coordinates: { lat: 53.905, lng: 27.555 }
-  },
-  {
-    id: 3,
-    title: "Спектакль 'Вишневый сад'",
-    location: "Национальный академический театр им. Янки Купалы",
-    address: "ул. Энгельса, 7",
-    date: "2024-01-20",
-    time: "19:00",
-    category: "Театр",
-    coordinates: { lat: 53.901, lng: 27.560 }
-  }
-];
+const parseDate = (dateStr: string) => {
+  if (!dateStr) return new Date().toISOString().split('T')[0];
+  const firstDate = dateStr.split(',')[0].trim();
+  const parts = firstDate.split(' ');
+  const day = parseInt(parts[0], 10);
+  const monthStr = parts[1];
+  const monthMap = {
+    'января': '01', 'февраля': '02', 'марта': '03', 'апреля': '04', 'мая': '05', 'июня': '06',
+    'июля': '07', 'августа': '08', 'сентября': '09', 'октября': '10', 'ноября': '11', 'декабря': '12'
+  };
+  const month = monthMap[monthStr] || '01';
+  const year = new Date().getFullYear();
+  return `${year}-${month}-${day.toString().padStart(2, '0')}`;
+};
+
+const capitalizeFirstLetter = (str: string) => {
+  if (!str || typeof str !== 'string') return '';
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+};
 
 const Map = () => {
-  const [selectedEvent, setSelectedEvent] = useState<typeof mapEvents[0] | null>(null);
+  const [events, setEvents] = useState<any[]>([]);
+  const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const spreadsheetId = '1U1qBrsnQsv2wn0EkGU7GPMZX88wcHKnc2hvHkdykUZk';
+        const apiKey = 'AIzaSyBScuwFWwr9fhUpAnKytPYfiAlf8bw2voQ';
+        const range = 'A1:K';
+        const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?key=${apiKey}`;
+        
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch: ${response.status} ${response.statusText}`);
+        }
+        const data = await response.json();
+        
+        if (!data.values || data.values.length < 2) {
+          throw new Error('No data found in the sheet');
+        }
+        
+        const headers = data.values[0];
+        const rows = data.values.slice(1);
+        
+        const rawEvents = rows.map((row: string[], index: number) => {
+          const eventObj: any = { id: index + 1 };
+          headers.forEach((header: string, index: number) => {
+            eventObj[header] = row[index] || '';
+          });
+          return eventObj;
+        });
+        
+        const mappedEvents = rawEvents.map((event: any, index: number) => {
+          const [lat, lng] = event['Координаты'] ? event['Координаты'].split(',').map((coord: string) => parseFloat(coord.trim())) : [0, 0];
+          return {
+            id: index + 1,
+            title: event['Название'] || '',
+            description: event['Краткое описание'] || '',
+            date: parseDate(event['Дата'] || ''),
+            time: event['Время'] || '',
+            location: event['Место'] || '',
+            address: event['Адрес'] || '',
+            category: event['Жанр'] || '',
+            cost: event['Стоимость'] || '',
+            image: event['Фото'] || '',
+            link: event['Ссылка'] || '',
+            coordinates: { lat, lng }
+          };
+        }).filter((event: any) => event.title && event.coordinates.lat && event.coordinates.lng);
+        
+        setEvents(mappedEvents);
+      } catch (err: any) {
+        console.error('Error fetching from Google Sheets:', err);
+        setError(`Error fetching data: ${err.message}. Make sure the sheet is publicly accessible.`);
+      }
+    };
+
+    fetchEvents();
+  }, []);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -67,97 +112,105 @@ const Map = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Yandex Map */}
-          <div className="lg:col-span-2">
-            <Card className="h-[600px] relative overflow-hidden">
-              <div className="absolute inset-0">
-                <YMaps>
-                  <YMap
-                    defaultState={{ center: [53.9023, 27.5619], zoom: 12 }}
-                    width="100%"
-                    height="100%"
-                    options={{
-                      suppressMapOpenBlock: true,
-                    }}
-                  >
-                    <ZoomControl options={{ position: { right: 16, top: 16 } }} />
-                    <GeolocationControl options={{ position: { right: 16, top: 64 } }} />
-                    {mapEvents.map((event) => (
-                      <Placemark
-                        key={event.id}
-                        geometry={[event.coordinates.lat, event.coordinates.lng]}
-                        properties={{
-                          balloonContentHeader: event.title,
-                          balloonContentBody: `<div>${event.location}<br/>${event.address}</div>`,
-                          hintContent: event.title,
-                        }}
-                        options={{
-                          preset: selectedEvent?.id === event.id ? 'islands#redIcon' : 'islands#blueIcon',
-                          openBalloonOnClick: false,
-                        }}
-                        modules={["geoObject.addon.hint", "geoObject.addon.balloon"]}
-                        onClick={() => setSelectedEvent(event)}
-                      />
-                    ))}
-                  </YMap>
-                </YMaps>
-              </div>
-              {/* Legend */}
-              <div className="absolute bottom-4 left-4 bg-card/95 backdrop-blur-sm rounded-lg p-3 shadow-lg">
-                <div className="text-sm font-medium mb-2">Легенда:</div>
-                <div className="flex items-center space-x-2 text-xs">
-                  <div className="w-4 h-4 bg-primary rounded-full"></div>
-                  <span>Мероприятие</span>
-                </div>
-              </div>
-            </Card>
+        {error ? (
+          <div className="text-center py-12 max-w-md mx-auto">
+            <MapPin size={64} className="mx-auto text-muted-foreground mb-6" />
+            <h3 className="text-xl font-semibold mb-4">{error}</h3>
+            <Link to="/events">
+              <Button className="btn-cultural">
+                Все мероприятия
+              </Button>
+            </Link>
           </div>
-          
-          {/* Events List */}
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold">Мероприятия на карте</h2>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <Card className="h-[600px] relative overflow-hidden">
+                <div className="absolute inset-0">
+                  <YMaps>
+                    <YMap
+                      defaultState={{ center: [53.9023, 27.5619], zoom: 12 }}
+                      width="100%"
+                      height="100%"
+                      options={{
+                        suppressMapOpenBlock: true,
+                      }}
+                    >
+                      <ZoomControl options={{ position: { right: 16, top: 16 } }} />
+                      <GeolocationControl options={{ position: { right: 16, top: 64 } }} />
+                      {events.map((event) => (
+                        <Placemark
+                          key={event.id}
+                          geometry={[event.coordinates.lat, event.coordinates.lng]}
+                          properties={{
+                            balloonContentHeader: event.title,
+                            balloonContentBody: `<div>${event.location}<br/>${event.address}</div>`,
+                            hintContent: event.title,
+                          }}
+                          options={{
+                            preset: selectedEvent?.id === event.id ? 'islands#redIcon' : 'islands#blueIcon',
+                            openBalloonOnClick: false,
+                          }}
+                          modules={["geoObject.addon.hint", "geoObject.addon.balloon"]}
+                          onClick={() => setSelectedEvent(event)}
+                        />
+                      ))}
+                    </YMap>
+                  </YMaps>
+                </div>
+                <div className="absolute bottom-4 left-4 bg-card/95 backdrop-blur-sm rounded-lg p-3 shadow-lg">
+                  <div className="text-sm font-medium mb-2">Легенда:</div>
+                  <div className="flex items-center space-x-2 text-xs">
+                    <div className="w-4 h-4 bg-primary rounded-full"></div>
+                    <span>Мероприятие</span>
+                  </div>
+                </div>
+              </Card>
+            </div>
             
-            {mapEvents.map((event, index) => (
-              <Card 
-                key={event.id}
-                className={`cursor-pointer transition-all duration-200 hover:shadow-md  ${
-                  selectedEvent?.id === event.id ? 'ring-2 ring-primary shadow-lg' : ''
-                }`}
-                onClick={() => setSelectedEvent(event)}
-              >
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center space-x-2">
-                      <div className="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold">
-                        {index + 1}
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold">Мероприятия на карте</h2>
+              
+              {events.map((event, index) => (
+                <Card 
+                  key={event.id}
+                  className={`cursor-pointer transition-all duration-200 hover:shadow-md ${
+                    selectedEvent?.id === event.id ? 'ring-2 ring-primary shadow-lg' : ''
+                  }`}
+                  onClick={() => setSelectedEvent(event)}
+                >
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold">
+                          {index + 1}
+                        </div>
+                        <Badge variant="secondary" className="text-xs">
+                          {capitalizeFirstLetter(event.category)}
+                        </Badge>
                       </div>
-                      <Badge variant="secondary" className="text-xs">
-                        {event.category}
-                      </Badge>
                     </div>
-                  </div>
-                  <CardTitle className="text-lg line-clamp-2">{event.title}</CardTitle>
-                  <CardDescription className="flex items-center">
-                    <MapPin size={14} className="mr-1" />
-                    {event.location}
-                  </CardDescription>
-                </CardHeader>
-                
-                <CardContent className="pt-0 space-y-2">
-                  <div className="flex items-center text-sm text-muted-foreground">
-                    <Calendar size={14} className="mr-2" />
-                    {formatDate(event.date)}
-                  </div>
+                    <CardTitle className="text-lg line-clamp-2">{event.title}</CardTitle>
+                    <CardDescription className="flex items-center">
+                      <MapPin size={14} className="mr-1" />
+                      {event.location}
+                    </CardDescription>
+                  </CardHeader>
                   
-                  <div className="flex items-center text-sm text-muted-foreground">
-                    <Clock size={14} className="mr-2" />
-                    {event.time}
-                  </div>
-                  
-                  <div className="text-sm text-muted-foreground">
-                    {event.address}
-                  </div>
+                  <CardContent className="pt-0 space-y-2">
+                    <div className="flex items-center text-sm text-muted-foreground">
+                      <Calendar size={14} className="mr-2" />
+                      {formatDate(event.date)}
+                    </div>
+                    
+                    <div className="flex items-center text-sm text-muted-foreground">
+                      <Clock size={14} className="mr-2" />
+                      {event.time}
+                    </div>
+                    
+                    <div className="text-sm text-muted-foreground">
+                      {event.address}
+                    </div>
                     <Link to={`/event/${event.id}`} className="block w-full">
                       <Button
                         className="w-full btn-outline-cultural 
@@ -169,37 +222,36 @@ const Map = () => {
                         Подробнее
                       </Button>
                     </Link>
+                  </CardContent>
+                </Card>
+              ))}
+              
+              <Card className="border-dashed border-2 border-muted-foreground/30">
+                <CardContent className="flex flex-col items-center justify-center py-8 text-center">
+                  <MapPin size={32} className="text-muted-foreground mb-3" />
+                  <p className="text-muted-foreground mb-4">
+                    Не видите свое мероприятие на карте?
+                  </p>
+                  <Link to="/#submit-form">
+                    <Button variant="outline"
+                      className="flex items-center
+                                group
+                                transition-all duration-300 
+                                hover:scale-105 hover:shadow-lg hover:shadow-primary/20 
+                                active:scale-95
+                                will-change-transform 
+                                backface-visibility-hidden"
+                    >
+                      Предложить мероприятие
+                    </Button>
+                  </Link>
                 </CardContent>
               </Card>
-            ))}
-            
-            {/* Add more events link */}
-            <Card className="border-dashed border-2 border-muted-foreground/30">
-              <CardContent className="flex flex-col items-center justify-center py-8 text-center">
-                <MapPin size={32} className="text-muted-foreground mb-3" />
-                <p className="text-muted-foreground mb-4">
-                  Не видите свое мероприятие на карте?
-                </p>
-                <Link to="/#submit-form">
-                  <Button variant="outline"
-                    className="flex items-center
-                              group
-                              transition-all duration-300 
-                              hover:scale-105 hover:shadow-lg hover:shadow-primary/20 
-                              active:scale-95
-                              will-change-transform 
-                              backface-visibility-hidden"
-                  >
-                    Предложить мероприятие
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Selected Event Details */}
-        {selectedEvent && (
+        {selectedEvent && !error && (
           <Card className="mt-6 border-primary/50 bg-gradient-to-r from-card to-primary/5">
             <CardHeader>
               <div className="flex items-center justify-between">

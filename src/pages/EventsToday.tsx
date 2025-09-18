@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -6,35 +7,93 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar, MapPin, Clock, Sparkles } from "lucide-react";
 
-// Mock data for today's events
-const todaysEvents = [
-  {
-    id: 1,
-    title: "Выставка современного искусства",
-    description: "Уникальная коллекция работ белорусских художников XXI века",
-    time: "18:00",
-    location: "Национальный художественный музей",
-    category: "Выставка",
-    status: "Начинается скоро"
-  },
-  {
-    id: 3,
-    title: "Спектакль 'Вишневый сад'",
-    description: "Классическая пьеса А.П. Чехова в современной интерпретации",
-    time: "19:00",
-    location: "Национальный академический театр им. Янки Купалы",
-    category: "Театр",
-    status: "Доступны билеты"
-  }
-];
+const parseDate = (dateStr: string) => {
+  if (!dateStr) return [];
+  const dates = dateStr.split(',').map(date => {
+    const parts = date.trim().split(' ');
+    const day = parseInt(parts[0], 10);
+    const monthStr = parts[1];
+    const monthMap = {
+      'января': '01', 'февраля': '02', 'марта': '03', 'апреля': '04', 'мая': '05', 'июня': '06',
+      'июля': '07', 'августа': '08', 'сентября': '09', 'октября': '10', 'ноября': '11', 'декабря': '12'
+    };
+    const month = monthMap[monthStr] || '01';
+    const year = new Date().getFullYear();
+    return `${year}-${month}-${day.toString().padStart(2, '0')}`;
+  });
+  return dates;
+};
+
+const capitalizeFirstLetter = (str: string) => {
+  if (!str || typeof str !== 'string') return '';
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+};
 
 const EventsToday = () => {
+  const [events, setEvents] = useState<any[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
   const today = new Date().toLocaleDateString('ru-RU', { 
     weekday: 'long',
     day: 'numeric',
     month: 'long',
     year: 'numeric'
   });
+  const todayStr = new Date().toISOString().split('T')[0];
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const spreadsheetId = '1U1qBrsnQsv2wn0EkGU7GPMZX88wcHKnc2hvHkdykUZk';
+        const apiKey = 'AIzaSyBScuwFWwr9fhUpAnKytPYfiAlf8bw2voQ';
+        const range = 'A1:K';
+        const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?key=${apiKey}`;
+        
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch: ${response.status} ${response.statusText}`);
+        }
+        const data = await response.json();
+        
+        if (!data.values || data.values.length < 2) {
+          throw new Error('No data found in the sheet');
+        }
+        
+        const headers = data.values[0];
+        const rows = data.values.slice(1);
+        
+        const rawEvents = rows.map((row: string[], index: number) => {
+          const eventObj: any = { id: index + 1 };
+          headers.forEach((header: string, index: number) => {
+            eventObj[header] = row[index] || '';
+          });
+          return eventObj;
+        });
+        
+        const mappedEvents = rawEvents.map((event: any, index: number) => ({
+          id: index + 1,
+          title: event['Название'] || '',
+          description: event['Краткое описание'] || '',
+          dates: parseDate(event['Дата'] || ''),
+          time: event['Время'] || '',
+          location: event['Место'] || '',
+          category: event['Жанр'] || '',
+          address: event['Адрес'] || '',
+          cost: event['Стоимость'] || '',
+          image: event['Фото'] || '',
+          link: event['Ссылка'] || '',
+          coordinates: event['Координаты'] || ''
+        })).filter((event: any) => event.title && event.dates.includes(todayStr));
+        
+        setEvents(mappedEvents);
+      } catch (err: any) {
+        console.error('Error fetching from Google Sheets:', err);
+        setError(`Error fetching data: ${err.message}. Make sure the sheet is publicly accessible.`);
+      }
+    };
+
+    fetchEvents();
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -55,9 +114,19 @@ const EventsToday = () => {
           </p>
         </div>
 
-        {todaysEvents.length > 0 ? (
+        {error ? (
+          <div className="text-center py-12 max-w-md mx-auto">
+            <Calendar size={64} className="mx-auto text-muted-foreground mb-6" />
+            <h3 className="text-xl font-semibold mb-4">{error}</h3>
+            <Link to="/events">
+              <Button className="btn-cultural">
+                Все мероприятия
+              </Button>
+            </Link>
+          </div>
+        ) : events.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-            {todaysEvents.map((event, index) => (
+            {events.map((event: any, index: number) => (
               <Card 
                 key={event.id} 
                 className="event-card animate-fade-in bg-gradient-to-br from-card to-card/50
@@ -66,18 +135,20 @@ const EventsToday = () => {
                            cursor-pointer"
                 style={{ animationDelay: `${index * 0.2}s` }}
               >
-                <div className="aspect-video bg-gradient-to-br from-primary/30 to-accent/30 rounded-t-xl relative">
-                  <Badge 
-                    className="absolute top-4 right-4 bg-accent text-accent-foreground"
-                  >
-                    {event.status}
-                  </Badge>
-                </div>
+                <div 
+                  className="aspect-video rounded-t-xl"
+                  style={{ 
+                    backgroundImage: `url(${event.image})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    backgroundColor: event.image ? 'transparent' : 'bg-gradient-to-br from-primary/30 to-accent/30'
+                  }}
+                ></div>
                 
                 <CardHeader>
                   <div className="flex justify-between items-start mb-2">
                     <Badge variant="secondary" className="text-xs">
-                      {event.category}
+                      {capitalizeFirstLetter(event.category)}
                     </Badge>
                   </div>
                   <CardTitle className="text-xl font-semibold line-clamp-2">
@@ -144,7 +215,7 @@ const EventsToday = () => {
           </div>
         )}
 
-        {todaysEvents.length > 0 && (
+        {events.length > 0 && (
           <div className="text-center mt-12">
             <Link to="/events">
               <Button variant="outline" size="lg"
@@ -155,8 +226,7 @@ const EventsToday = () => {
                           hover:scale-105 hover:shadow-lg hover:shadow-primary/20 
                           active:scale-95
                           will-change-transform 
-                          backface-visibility-hidden
-                          "
+                          backface-visibility-hidden"
               >
                 Посмотреть все мероприятия
               </Button>
