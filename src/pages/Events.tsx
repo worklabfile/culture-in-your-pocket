@@ -173,7 +173,12 @@ const Events = () => {
                 animationFillMode: 'forwards' 
               }}
             >
-              <div className="aspect-video bg-gradient-to-br from-primary/20 to-accent/20 rounded-t-xl"></div>              
+              <img
+                src={event.image || "/placeholder.svg"}
+                alt={event.title}
+                className="w-full aspect-video object-cover rounded-t-xl"
+                onError={(e) => { (e.currentTarget as HTMLImageElement).src = "/placeholder.svg"; }}
+              />
               <CardHeader>
                 <div className="flex justify-between items-center mb-2 gap-2">
                   <Badge variant="secondary" className="text-xs">

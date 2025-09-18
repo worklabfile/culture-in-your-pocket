@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Calendar, MapPin, Clock, ArrowLeft, Share2, Heart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { YMaps, Map as YMap, Placemark, ZoomControl } from "@pbe/react-yandex-maps";
 
 const parseDate = (dateStr: string) => {
   if (!dateStr) return new Date().toISOString().split('T')[0];
@@ -157,6 +158,8 @@ const EventDetail = () => {
           </Link>
         </div>
 
+        <h1 className="text-2xl md:text-3xl font-bold text-primary mb-6">{event.title}</h1>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
             <div 
@@ -168,54 +171,6 @@ const EventDetail = () => {
                 backgroundColor: event.image ? 'transparent' : 'bg-gradient-to-br from-primary/30 to-accent/30'
               }}
             ></div>
-            
-            <div className="space-y-4">
-              <div className="flex flex-wrap items-center gap-3">
-                <Badge variant="secondary" className="text-sm">
-                  {capitalizeFirstLetter(event.category)}
-                </Badge>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleShare}
-                    className="flex items-center
-                              group
-                              transition-all duration-300 
-                              hover:scale-105 hover:shadow-lg hover:shadow-primary/20 
-                              active:scale-95
-                              will-change-transform 
-                              backface-visibility-hidden"
-                  >
-                    <Share2 size={16} className="mr-1" />
-                    Поделиться
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleAddToFavorites}
-                    className="flex items-center
-                              group
-                              transition-all duration-300 
-                              hover:scale-105 hover:shadow-lg hover:shadow-primary/20 
-                              active:scale-95
-                              will-change-transform 
-                              backface-visibility-hidden"
-                  >
-                    <Heart size={16} className="mr-1" />
-                    В избранное
-                  </Button>
-                </div>
-              </div>
-              
-              <h1 className="text-3xl md:text-4xl font-bold text-primary">
-                {event.title}
-              </h1>
-              
-              <p className="text-lg text-muted-foreground leading-relaxed">
-                {event.description}
-              </p>
-            </div>
             
             <Card className="event-card">
               <CardContent className="pt-6">
@@ -229,6 +184,37 @@ const EventDetail = () => {
                 </div>
               </CardContent>
             </Card>
+
+            {(() => {
+              const [lat, lng] = (event.coordinates || '')
+                .split(',')
+                .map((coord: string) => parseFloat(coord.trim()));
+              const hasCoords = Number.isFinite(lat) && Number.isFinite(lng);
+              return hasCoords ? (
+                <Card className="event-card">
+                  <CardContent className="pt-6">
+                    <h2 className="text-xl font-semibold mb-4">Где пройдет мероприятие</h2>
+                    <div className="h-[360px] rounded-lg overflow-hidden">
+                      <YMaps>
+                        <YMap
+                          defaultState={{ center: [lat, lng], zoom: 14 }}
+                          width="100%"
+                          height="100%"
+                          options={{ suppressMapOpenBlock: true }}
+                        >
+                          <ZoomControl options={{ position: { right: 16, top: 16 } }} />
+                          <Placemark
+                            geometry={[lat, lng]}
+                            properties={{ hintContent: event.title, balloonContentHeader: event.title, balloonContentBody: `${event.location}<br/>${event.address}` }}
+                            modules={["geoObject.addon.hint", "geoObject.addon.balloon"]}
+                          />
+                        </YMap>
+                      </YMaps>
+                    </div>
+                  </CardContent>
+                </Card>
+              ) : null;
+            })()}
           </div>
           
           <div className="space-y-6">
@@ -285,20 +271,6 @@ const EventDetail = () => {
                       </Button>
                     </a>
                   )}
-                  <Link to="/map" className="block w-full">
-                    <Button variant="outline" 
-                      className="w-full
-                                group
-                                transition-all duration-300 
-                                hover:scale-105 hover:shadow-lg hover:shadow-primary/20 
-                                active:scale-95
-                                will-change-transform 
-                                backface-visibility-hidden
-                                border-none"
-                    >
-                      Показать на карте
-                    </Button>
-                  </Link>
                 </div>
               </CardContent>
             </Card>
