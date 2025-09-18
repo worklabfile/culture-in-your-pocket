@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -9,7 +9,6 @@ import { Input } from "@/components/ui/input";
 import { Calendar, MapPin, Clock, Search } from "lucide-react";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 
-// Helper function to parse the first date from the comma-separated list to YYYY-MM-DD format
 const parseDate = (dateStr) => {
   if (!dateStr) return new Date().toISOString().split('T')[0];
   const firstDate = dateStr.split(',')[0].trim();
@@ -21,8 +20,13 @@ const parseDate = (dateStr) => {
     'июля': '07', 'августа': '08', 'сентября': '09', 'октября': '10', 'ноября': '11', 'декабря': '12'
   };
   const month = monthMap[monthStr] || '01';
-  const year = new Date().getFullYear(); // Assume current year
+  const year = new Date().getFullYear();
   return `${year}-${month}-${day.toString().padStart(2, '0')}`;
+};
+
+const capitalizeFirstLetter = (str) => {
+  if (!str || typeof str !== 'string') return '';
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 };
 
 const Events = () => {
@@ -32,6 +36,7 @@ const Events = () => {
   const [selectedDate, setSelectedDate] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 15;
+  const eventsListRef = useRef(null);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -43,7 +48,7 @@ const Events = () => {
         
         const response = await fetch(url);
         if (!response.ok) {
-          throw new Error(`Failed to fetch data: ${response.status} ${response.statusText}`);
+          throw new Error(`Failed to fetch  ${response.status} ${response.statusText}`);
         }
         const data = await response.json();
         
@@ -87,22 +92,27 @@ const Events = () => {
     fetchEvents();
   }, []);
 
-  // Helper to get today's date in YYYY-MM-DD for comparisons
   const todayStr = new Date().toISOString().split('T')[0];
 
-  // Filter by title search and optional exact date, then exclude past dates
   const filteredEvents = events
     .filter(event => (event.title || '').toLowerCase().includes(searchTerm.toLowerCase()))
     .filter(event => (selectedDate ? event.date === selectedDate : true))
     .filter(event => event.date >= todayStr);
 
-  // Sort ascending by date (from today onwards)
   const sortedEvents = [...filteredEvents].sort((a, b) => (a.date > b.date ? 1 : a.date < b.date ? -1 : 0));
 
-  // Pagination
   const totalPages = Math.ceil(sortedEvents.length / ITEMS_PER_PAGE) || 1;
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const paginatedEvents = sortedEvents.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+  useEffect(() => {
+    setTimeout(() => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }, 100);
+  }, [currentPage]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -151,7 +161,7 @@ const Events = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredEvents.map((event, index) => (
+          {paginatedEvents.map((event, index) => (
             <Card 
               key={event.id} 
               className="event-card animate-fade-in opacity-0
@@ -165,12 +175,12 @@ const Events = () => {
             >
               <div className="aspect-video bg-gradient-to-br from-primary/20 to-accent/20 rounded-t-xl"></div>              
               <CardHeader>
-                <div className="flex justify-between items-start mb-2">
+                <div className="flex justify-between items-center mb-2 gap-2">
                   <Badge variant="secondary" className="text-xs">
-                    {event.category}
+                    {capitalizeFirstLetter(event.category)}
                   </Badge>
                   {event.cost && (
-                    <Badge variant="outline" className="text-xs">
+                    <Badge variant="outline" className="text-xs whitespace-nowrap">
                       {event.cost}
                     </Badge>
                   )}

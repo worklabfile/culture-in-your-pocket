@@ -262,7 +262,8 @@ const EventDetail = () => {
                                 hover:scale-105 hover:shadow-lg hover:shadow-primary/20 
                                 active:scale-95
                                 will-change-transform 
-                                backface-visibility-hiddens"
+                                backface-visibility-hiddens
+                                border-none"
                     >
                       Показать на карте
                     </Button>

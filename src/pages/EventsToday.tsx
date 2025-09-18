@@ -156,7 +156,7 @@ const EventsToday = () => {
                           active:scale-95
                           will-change-transform 
                           backface-visibility-hidden
-                          border-none"
+                          "
               >
                 Посмотреть все мероприятия
               </Button>
