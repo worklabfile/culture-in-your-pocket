@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom"; // 👈 добавили useNavigate
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import EventSubmissionForm from "@/components/EventSubmissionForm";
@@ -8,6 +8,8 @@ import { MapPin, Calendar, Users, Sparkles, ArrowRight, Heart } from "lucide-rea
 import { Building2, Smile } from "lucide-react";
 
 const Index = () => {
+  const navigate = useNavigate(); // 👈 инициализация
+
   const features = [
     {
       icon: Calendar,
@@ -61,7 +63,7 @@ const Index = () => {
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <Link to="/map">
+                {/* 👇 Заменили Link на Button с navigate + scrollTo */}
                 <Button
                   size="lg"
                   className="btn-cultural text-lg px-8 py-4 
@@ -69,6 +71,12 @@ const Index = () => {
                             transition-all duration-300 
                             hover:scale-105 hover:shadow-xl hover:shadow-primary/30 
                             active:scale-95"
+                  onClick={() => {
+                    navigate('/map');
+                    setTimeout(() => {
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }, 100);
+                  }}
                 >
                   <MapPin
                     className="mr-2 transition-transform duration-300 group-hover:scale-120 group-hover:rotate-12"
@@ -80,7 +88,6 @@ const Index = () => {
                     size={20}
                   />
                 </Button>
-                </Link>
                 <Link to="/events/today">
                 <Button
                   size="lg"
@@ -170,8 +177,6 @@ const Index = () => {
           </div>
         </section>
 
-        
-
         {/* Event Submission Form Section */}
         <section id="submit-form" className="py-20 bg-subtle-gradient">
           <div className="container mx-auto px-4">
@@ -219,7 +224,7 @@ const Index = () => {
                   Все мероприятия
                 </Button>
                 </Link>
-                <Link to="/map">
+                {/* 👇 Заменили Link на Button с navigate + scrollTo */}
                 <Button
                   size="lg"
                   variant="outline"
@@ -233,6 +238,12 @@ const Index = () => {
                             hover:scale-105 hover:shadow-md 
                             active:scale-95 
                             group"
+                  onClick={() => {
+                    navigate('/map');
+                    setTimeout(() => {
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }, 100);
+                  }}
                 >
                   <MapPin
                     className="mr-2 transition-transform duration-300 group-hover:scale-120 group-hover:rotate-12"
@@ -240,7 +251,6 @@ const Index = () => {
                   />
                   Открыть карту
                 </Button>
-                </Link>
               </div>
             </div>
           </div>
