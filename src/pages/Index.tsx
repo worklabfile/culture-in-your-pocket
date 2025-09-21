@@ -47,7 +47,7 @@ const Index = () => {
             muted
             playsInline
             className="w-full h-full object-cover"
-            src="\src\assets\hero-video.mp4"
+            src="/videos/hero-video.mp4"
           />
         </div>
           <div className="absolute inset-0 bg-amber-400/10 pointer-events-none"></div>
