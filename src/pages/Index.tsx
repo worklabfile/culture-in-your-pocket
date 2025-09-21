@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom"; // 👈 добавили useNavigate
+import { Link, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import EventSubmissionForm from "@/components/EventSubmissionForm";
@@ -8,7 +8,7 @@ import { MapPin, Calendar, Users, Sparkles, ArrowRight, Heart } from "lucide-rea
 import { Building2, Smile } from "lucide-react";
 
 const Index = () => {
-  const navigate = useNavigate(); // 👈 инициализация
+  const navigate = useNavigate(); 
 
   const features = [
     {
@@ -70,7 +70,8 @@ const Index = () => {
                             group 
                             transition-all duration-300 
                             hover:scale-105 hover:shadow-xl hover:shadow-primary/30 
-                            active:scale-95"
+                            active:scale-95
+                            w-full sm:w-auto min-w-[240px]"
                   onClick={() => {
                     navigate('/map');
                     setTimeout(() => {
@@ -88,23 +89,23 @@ const Index = () => {
                     size={20}
                   />
                 </Button>
-                <Link to="/events/today">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="btn-outline-cultural text-lg px-8 py-4 
-                            group 
-                            transition-all duration-300 
-                            hover:scale-105 hover:shadow-lg hover:shadow-primary/20 
-                            active:scale-95
-                            border-none"
-                >
-                  <Calendar
-                    className="mr-2 transition-transform duration-300 group-hover:scale-120 group-hover:rotate-12"
-                    size={20}
-                  />
-                  Что сегодня?
-                </Button>
+                <Link to="/events/today" className="w-full sm:w-auto">
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="text-lg px-8 py-4 
+                              group 
+                              transition-all duration-300 
+                              hover:scale-105 hover:shadow-lg hover:shadow-primary/20 
+                              active:scale-95
+                              w-full sm:w-auto min-w-[240px]"
+                  >
+                    <Calendar
+                      className="mr-2 transition-transform duration-300 group-hover:scale-120 group-hover:rotate-12"
+                      size={20}
+                    />
+                    Что сегодня?
+                  </Button>
                 </Link>
               </div>
             </div>
@@ -215,7 +216,8 @@ const Index = () => {
                             hover:scale-105 hover:shadow-md 
                             hover:bg-secondary/90 
                             active:scale-95 
-                            relative group"
+                            relative group
+                            w-full sm:w-auto min-w-[240px]"
                 >
                   <Heart
                     className="mr-2 transition-transform duration-300 group-hover:scale-120 group-hover:rotate-12"
@@ -237,7 +239,8 @@ const Index = () => {
                             transition-all duration-300 
                             hover:scale-105 hover:shadow-md 
                             active:scale-95 
-                            group"
+                            group
+                            w-full sm:w-auto min-w-[240px]"
                   onClick={() => {
                     navigate('/map');
                     setTimeout(() => {
